@@ -1,5 +1,5 @@
-numpy>=1.21.0
-torch>=1.13.0
-matplotlib>=3.5.0
-gym>=0.21.0
-dataclasses>=0.6
+fastapi>=0.104.1
+uvicorn[standard]>=0.24.0
+httpx>=0.25.0
+pydantic>=2.4.0
+python-multipart>=0.0.6
