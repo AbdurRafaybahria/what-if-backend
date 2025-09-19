@@ -785,7 +785,8 @@ class ScenarioGenerator:
         total_cost = 0.0
         
         # Process tasks in CMS order
-        for process_task in sorted(cms_data['process_tasks'], key=lambda x: x['order']):
+        process_tasks = cms_data.get('process_task', cms_data.get('process_tasks', []))
+        for process_task in sorted(process_tasks, key=lambda x: x['order']):
             task = process_task['task']
             duration_hours = task['task_capacity_minutes'] / 60.0
             
@@ -846,7 +847,8 @@ class ScenarioGenerator:
         task_groups = []
         current_group = []
         
-        for process_task in sorted(cms_data['process_tasks'], key=lambda x: x['order']):
+        process_tasks = cms_data.get('process_task', cms_data.get('process_tasks', []))
+        for process_task in sorted(process_tasks, key=lambda x: x['order']):
             task = process_task['task']
             # Simple grouping: tasks with same or adjacent order can be parallel
             if not current_group or process_task['order'] - current_group[-1]['order'] <= 1:
@@ -904,7 +906,8 @@ class ScenarioGenerator:
         # Track resource availability
         resource_availability = {}
         
-        for process_task in sorted(cms_data['process_tasks'], key=lambda x: x['order']):
+        process_tasks = cms_data.get('process_task', cms_data.get('process_tasks', []))
+        for process_task in sorted(process_tasks, key=lambda x: x['order']):
             task = process_task['task']
             duration_hours = task['task_capacity_minutes'] / 60.0
             
@@ -958,7 +961,8 @@ class ScenarioGenerator:
         critical_tasks = []
         non_critical_tasks = []
         
-        for process_task in sorted(cms_data['process_tasks'], key=lambda x: x['order']):
+        process_tasks = cms_data.get('process_task', cms_data.get('process_tasks', []))
+        for process_task in sorted(process_tasks, key=lambda x: x['order']):
             task = process_task['task']
             duration_minutes = task['task_capacity_minutes']
             

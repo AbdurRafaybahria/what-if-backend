@@ -132,6 +132,21 @@ async def optimize_cms_process_by_id(process_id: int):
         # Generate optimized scenarios from CMS baseline
         scenarios = generator.generate_cms_optimization_scenarios(cms_baseline, cms_data)
         
+        # Extract task and resource names for response
+        task_names = {}
+        resource_names = {}
+        
+        process_tasks = cms_data.get('process_task', cms_data.get('process_tasks', []))
+        for process_task in process_tasks:
+            task_data = process_task['task']
+            task_id = f"task_{task_data['task_id']:03d}"
+            task_names[task_id] = task_data['task_name']
+            
+            for job_task in task_data['jobTasks']:
+                job = job_task['job']
+                resource_id = f"resource_{job['job_id']:03d}"
+                resource_names[resource_id] = job['name']
+        
         return {
             "scenarios": [scenario.to_dict() for scenario in scenarios],
             "baseline": cms_baseline.to_dict(),
@@ -139,7 +154,9 @@ async def optimize_cms_process_by_id(process_id: int):
                 "process_id": cms_data['process_id'],
                 "process_name": cms_data['process_name'],
                 "company": cms_data.get('company', {}).get('name', 'Unknown')
-            }
+            },
+            "task_names": task_names,
+            "resource_names": resource_names
         }
     except Exception as e:
         print(f"Error optimizing CMS process {process_id}: {e}")
@@ -448,4 +465,5 @@ if __name__ == "__main__":
     import uvicorn
     import os
     port = int(os.environ.get("PORT", 8002))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    host = os.environ.get("HOST", "192.168.100.15")
+    uvicorn.run(app, host=host, port=port)

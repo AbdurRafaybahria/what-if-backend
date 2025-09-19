@@ -9,18 +9,20 @@ def transform_cms_to_internal(cms_data: Dict) -> Dict:
     Transform CMS process data to internal project format
     
     Args:
-        cms_data: CMS process data with process_tasks structure
+        cms_data: CMS process data with process_task structure
         
     Returns:
         Dict: Internal project format compatible with existing optimization system
     """
     
-    # Extract tasks from process_tasks
+    # Extract tasks from process_task (handle both singular and plural)
     tasks = []
     resources = []
     resource_ids_seen = set()
     
-    for process_task in cms_data['process_tasks']:
+    process_tasks = cms_data.get('process_task', cms_data.get('process_tasks', []))
+    
+    for process_task in process_tasks:
         task_data = process_task['task']
         
         # Convert minutes to hours
@@ -100,7 +102,7 @@ def validate_cms_data(cms_data: Dict) -> bool:
         bool: True if valid, False otherwise
     """
     required_fields = [
-        'process_id', 'process_name', 'process_overview', 'process_tasks'
+        'process_id', 'process_name', 'process_overview'
     ]
     
     # Check top-level fields
@@ -108,11 +110,12 @@ def validate_cms_data(cms_data: Dict) -> bool:
         if field not in cms_data:
             return False
     
-    # Check process_tasks structure
-    if not isinstance(cms_data['process_tasks'], list):
+    # Check for either process_task or process_tasks
+    process_tasks = cms_data.get('process_task', cms_data.get('process_tasks', []))
+    if not isinstance(process_tasks, list) or len(process_tasks) == 0:
         return False
     
-    for process_task in cms_data['process_tasks']:
+    for process_task in process_tasks:
         if 'task' not in process_task or 'order' not in process_task:
             return False
             
@@ -155,14 +158,15 @@ def get_cms_transformation_summary(cms_data: Dict) -> Dict:
     Returns:
         Dict: Summary of transformation details
     """
-    total_tasks = len(cms_data['process_tasks'])
+    process_tasks = cms_data.get('process_task', cms_data.get('process_tasks', []))
+    total_tasks = len(process_tasks)
     total_duration_minutes = sum(
         task['task']['task_capacity_minutes'] 
-        for task in cms_data['process_tasks']
+        for task in process_tasks
     )
     
     unique_jobs = set()
-    for process_task in cms_data['process_tasks']:
+    for process_task in process_tasks:
         for job_task in process_task['task']['jobTasks']:
             unique_jobs.add(job_task['job']['job_id'])
     
