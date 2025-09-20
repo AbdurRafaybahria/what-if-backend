@@ -19,13 +19,20 @@ from src.optimization.pareto_optimizer import ParetoOptimizer
 
 app = FastAPI(title="What-If Analysis API", version="1.0.0")
 
-# Enable CORS for frontend
+# Enable CORS for frontend with specific HTTPS origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "*",
+        "https://fyp-cms-frontend.vercel.app",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://192.168.100.15:3000"
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["*"]
 )
 
 class CustomConstraints(BaseModel):
@@ -104,7 +111,7 @@ async def get_available_processes():
 
     raise HTTPException(status_code=404, detail="This endpoint has been removed. Use /optimize/cms-process/{process_id} instead")
 
-@app.post("/optimize/cms-process/{process_id}")
+@app.get("/optimize/cms-process/{process_id}")
 async def optimize_cms_process_by_id(process_id: int):
     """Fetch CMS process by ID and optimize it"""
     try:
@@ -465,5 +472,14 @@ if __name__ == "__main__":
     import uvicorn
     import os
     port = int(os.environ.get("PORT", 8002))
-    host = os.environ.get("HOST", "192.168.100.15")
-    uvicorn.run(app, host=host, port=port)
+    host = os.environ.get("HOST", "0.0.0.0")
+    
+    # For development, allow HTTP from HTTPS origins
+    # In production, you should use proper SSL certificates
+    uvicorn.run(
+        app, 
+        host=host, 
+        port=port,
+        # ssl_keyfile="path/to/key.pem",  # Uncomment for HTTPS
+        # ssl_certfile="path/to/cert.pem"  # Uncomment for HTTPS
+    )
