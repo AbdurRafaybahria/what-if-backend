@@ -19,19 +19,35 @@ from src.optimization.pareto_optimizer import ParetoOptimizer
 
 app = FastAPI(title="What-If Analysis API", version="1.0.0")
 
-# Enable CORS for frontend with specific HTTPS origins
+# Enable CORS for frontend with specific HTTPS origins and localhost
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "*",
         "https://fyp-cms-frontend.vercel.app",
         "http://localhost:3000",
+        "http://localhost:3001", 
+        "http://localhost:5173",  # Vite dev server
+        "http://localhost:8080",  # Alternative dev port
         "http://127.0.0.1:3000",
-        "http://192.168.100.15:3000"
+        "http://127.0.0.1:3001",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:8080",
+        "http://192.168.100.15:3000",
+        "*"  # Allow all origins as fallback
     ],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_headers=[
+        "Accept",
+        "Accept-Language", 
+        "Content-Language",
+        "Content-Type",
+        "Authorization",
+        "X-Requested-With",
+        "Origin",
+        "Access-Control-Request-Method",
+        "Access-Control-Request-Headers"
+    ],
     expose_headers=["*"]
 )
 
